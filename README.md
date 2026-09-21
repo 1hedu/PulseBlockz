@@ -21,6 +21,22 @@ All three run on one engine: Godot 4 with a sandboxed Luau VM that speaks Roblox
 79% of its classes, 92% of its properties (`PARITY.md`). A place's scripts cannot reach the
 disk, the network or a key.
 
+![The Studio editing a place](docs/shots/studio.png)
+
+*The Studio. An explorer, properties, handles and an output pane over a place that is only files
+on disk, and a Play button that runs it here.*
+
+![The Player showing a place before it runs](docs/shots/player.png)
+
+*The Player, before it runs a line. What the place is, what it weighs, who published it, the hash
+its code is named by, and every way it could reach your wallet. The address is covered here; the
+app shows it.*
+
+![The Publisher checking a place](docs/shots/publisher.png)
+
+*The Publisher. It reads the folder, lists every file and what it will cost, and writes the
+capabilities into the manifest — a place cannot ask for one it did not declare.*
+
 ## Run it
 
 Download the release for your machine and run any of the three apps. They share the engine
