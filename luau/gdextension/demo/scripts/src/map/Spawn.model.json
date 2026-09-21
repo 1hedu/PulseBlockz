@@ -1,0 +1,17 @@
+{
+  "className": "SpawnLocation",
+  "properties": {
+    "Color": {
+      "Color3uint8": [
+        200,
+        200,
+        200
+      ]
+    },
+    "Position": [
+      0,
+      0.5,
+      4
+    ]
+  }
+}

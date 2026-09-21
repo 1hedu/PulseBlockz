@@ -1,0 +1,86 @@
+{
+  "children": [
+    {
+      "className": "ClickDetector",
+      "name": "ClickDetector"
+    },
+    {
+      "children": [
+        {
+          "className": "TextLabel",
+          "name": "Count",
+          "properties": {
+            "BackgroundColor3": {
+              "Color3uint8": [
+                0,
+                0,
+                0
+              ]
+            },
+            "BackgroundTransparency": 0.4,
+            "Size": [
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "Text": "Clicks: 0",
+            "TextColor3": {
+              "Color3uint8": [
+                255,
+                255,
+                255
+              ]
+            },
+            "TextScaled": true
+          }
+        }
+      ],
+      "className": "BillboardGui",
+      "name": "Tag",
+      "properties": {
+        "AlwaysOnTop": true,
+        "Size": [
+          [
+            4,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "StudsOffset": [
+          0,
+          2.5,
+          0
+        ]
+      }
+    }
+  ],
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        245,
+        205,
+        48
+      ]
+    },
+    "Position": [
+      4.5,
+      4,
+      -8
+    ],
+    "Size": [
+      3,
+      3,
+      0.4
+    ]
+  }
+}

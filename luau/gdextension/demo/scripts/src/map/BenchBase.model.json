@@ -1,0 +1,24 @@
+{
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        120,
+        80,
+        40
+      ]
+    },
+    "Material": "Wood",
+    "Position": [
+      19,
+      0.5,
+      8
+    ],
+    "Size": [
+      5,
+      1,
+      2
+    ]
+  }
+}

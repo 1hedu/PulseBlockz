@@ -1,0 +1,23 @@
+{
+  "className": "Part",
+  "properties": {
+    "Color": {
+      "Color3uint8": [
+        120,
+        120,
+        120
+      ]
+    },
+    "Position": [
+      -14,
+      8,
+      0
+    ],
+    "Shape": "Ball",
+    "Size": [
+      3,
+      3,
+      3
+    ]
+  }
+}

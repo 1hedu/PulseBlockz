@@ -1,0 +1,66 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "className": "WeldConstraint",
+          "name": "WeldConstraint",
+          "properties": {
+            "Part0": "Chassis",
+            "Part1": "Seat"
+          }
+        }
+      ],
+      "className": "Part",
+      "name": "Chassis",
+      "properties": {
+        "Color": {
+          "Color3uint8": [
+            196,
+            40,
+            28
+          ]
+        },
+        "Position": [
+          -6,
+          1,
+          14
+        ],
+        "Size": [
+          4,
+          1,
+          6
+        ]
+      }
+    },
+    {
+      "className": "VehicleSeat",
+      "name": "Seat",
+      "properties": {
+        "Color": {
+          "Color3uint8": [
+            27,
+            42,
+            53
+          ]
+        },
+        "MaxSpeed": 40,
+        "Position": [
+          -6,
+          2,
+          15
+        ],
+        "Size": [
+          2,
+          1,
+          2
+        ],
+        "TurnSpeed": 2
+      }
+    }
+  ],
+  "className": "Model",
+  "properties": {
+    "PrimaryPart": "Chassis"
+  }
+}

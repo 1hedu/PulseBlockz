@@ -1,0 +1,26 @@
+{
+  "name": "pulseblockz-ledger",
+  "version": "0.9-beta",
+  "description": "",
+  "scripts": {
+    "compile": "node scripts/compile.js",
+    "deploy": "node scripts/deploy.js",
+    "bridge": "node bridge/src/server.js",
+    "e2e": "node scripts/e2e.js",
+    "test:duels": "node scripts/compile.js && node --test scripts/test/duelrecords.test.js",
+    "test:fishing": "node scripts/compile.js && node --test scripts/test/fishing.test.js",
+    "test:announcements": "node scripts/compile.js && node --test scripts/test/announcements.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "@openzeppelin/contracts": "5.0.2",
+    "ethers": "^6.17.0",
+    "express": "^4.22.2",
+    "solc": "^0.8.28"
+  },
+  "devDependencies": {
+    "@ethereumjs/evm": "^10.1.3"
+  }
+}

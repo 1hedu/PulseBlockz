@@ -1,0 +1,43 @@
+{
+  "children": [
+    {
+      "className": "SpotLight",
+      "name": "Beam",
+      "properties": {
+        "Angle": 100,
+        "Brightness": 2,
+        "Color": {
+          "Color3uint8": [
+            255,
+            240,
+            200
+          ]
+        },
+        "Face": "Bottom",
+        "Range": 14
+      }
+    }
+  ],
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        255,
+        240,
+        200
+      ]
+    },
+    "Material": "Neon",
+    "Position": [
+      -8,
+      8.3,
+      10
+    ],
+    "Size": [
+      2,
+      0.6,
+      2
+    ]
+  }
+}

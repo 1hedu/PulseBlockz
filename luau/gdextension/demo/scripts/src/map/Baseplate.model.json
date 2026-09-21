@@ -1,0 +1,23 @@
+{
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        99,
+        95,
+        98
+      ]
+    },
+    "Position": [
+      0,
+      -0.5,
+      0
+    ],
+    "Size": [
+      64,
+      1,
+      64
+    ]
+  }
+}

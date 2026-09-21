@@ -1,0 +1,38 @@
+{
+  "children": [
+    {
+      "className": "SpecialMesh",
+      "name": "SpecialMesh",
+      "properties": {
+        "MeshType": "Sphere",
+        "Scale": [
+          1.5,
+          1,
+          1.5
+        ]
+      }
+    }
+  ],
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        255,
+        120,
+        200
+      ]
+    },
+    "Material": "Neon",
+    "Position": [
+      -20,
+      1,
+      6
+    ],
+    "Size": [
+      2,
+      2,
+      2
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "className": "Tool",
+  "properties": {
+    "ToolTip": "Wave it",
+    "GripPos": [0, 0, 1],
+    "GripForward": [0, -1, 0],
+    "GripUp": [0, 0, -1]
+  }
+}

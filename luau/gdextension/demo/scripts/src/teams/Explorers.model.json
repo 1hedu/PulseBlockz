@@ -1,0 +1,7 @@
+{
+  "className": "Team",
+  "properties": {
+    "TeamColor": "Bright blue",
+    "AutoAssignable": true
+  }
+}

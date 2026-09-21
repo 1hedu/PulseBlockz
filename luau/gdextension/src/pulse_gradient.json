@@ -1,0 +1,11 @@
+{
+  "_note": "The PulseBlockz gradient: the default character skin (pulseblockz_world.cpp, through the pulse_gradient.gen.h SConstruct writes from this file), and scripts/prep-gradient.js's pulse-gradient.png, which the cane's orb and the Engram wear. One definition, so they cannot drift. Colours are sRGB 0..1; blended cubically in OKLab between stops.",
+  "stops": [
+    { "t": 0.00, "rgb": [1.00, 0.08, 0.20] },
+    { "t": 0.20, "rgb": [1.00, 0.06, 0.63] },
+    { "t": 0.40, "rgb": [0.70, 0.12, 1.00] },
+    { "t": 0.58, "rgb": [0.39, 0.20, 1.00] },
+    { "t": 0.76, "rgb": [0.12, 0.47, 1.00] },
+    { "t": 1.00, "rgb": [0.08, 0.90, 1.00] }
+  ]
+}

@@ -1,0 +1,19 @@
+; PulseBlockz Publisher -- puts a place on chain. See Publisher.gd.
+
+config_version=5
+
+[application]
+
+config/name="PulseBlockz Publisher"
+run/main_scene="res://Publisher.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[autoload]
+
+Curation="*res://host/Curation.gd"
+ChainAssets="*res://host/ChainAssets.gd"
+
+[display]
+
+window/size/viewport_width=1100
+window/size/viewport_height=800

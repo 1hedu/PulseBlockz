@@ -1,0 +1,17 @@
+{
+  "className": "Seat",
+  "properties": {
+    "Anchored": true,
+    "Material": "Wood",
+    "Position": [
+      19,
+      1.5,
+      8
+    ],
+    "Size": [
+      5,
+      1,
+      2
+    ]
+  }
+}

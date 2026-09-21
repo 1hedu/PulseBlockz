@@ -1,0 +1,24 @@
+; PulseBlockz -- the Player. Opens published experiences off the chain and plays them.
+; It holds no place of its own; see Player.gd.
+
+config_version=5
+
+[application]
+
+config/name="PulseBlockz"
+run/main_scene="res://Player.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[autoload]
+
+Curation="*res://host/Curation.gd"
+ChainAssets="*res://host/ChainAssets.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[rendering]
+
+anti_aliasing/quality/msaa_3d=2

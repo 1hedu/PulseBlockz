@@ -1,0 +1,28 @@
+{
+  "className": "WedgePart",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        75,
+        151,
+        75
+      ]
+    },
+    "Orientation": [
+      0,
+      180,
+      0
+    ],
+    "Position": [
+      12,
+      1.5,
+      8
+    ],
+    "Size": [
+      6,
+      3,
+      8
+    ]
+  }
+}

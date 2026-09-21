@@ -1,0 +1,62 @@
+node_modules/
+artifacts/
+addresses.json
+
+# luau/ build outputs and third-party checkouts (see luau/README.md)
+luau/luau/
+luau/godot-cpp/
+luau/secp256k1/
+luau/harness
+luau/gdextension/demo/bin/
+luau/gdextension/.sconsign.dblite
+luau/gdextension/.sconf_temp/
+**/*.o
+**/*.os
+luau/gdextension/demo/.godot/
+luau/gdextension/studio/bin/
+luau/gdextension/studio/.godot/
+luau/harness.exe
+luau/build_tmp*/
+luau/*.pdb
+# MSVC objects: the harness's beside luau/, scons's named for their target. A .obj mesh is a file to keep.
+luau/*.obj
+**/*.x86_64.obj
+*.ilk
+*.pdb
+luau/scons_out.txt
+luau/out*.txt
+luau/gdextension/demo/godot_out.txt
+luau/gdextension/demo/test_out.txt
+luau/gdextension/demo/net_out.txt
+luau/gdextension/.sconsign.tmp
+scons_out.txt
+addresses.*.json
+!addresses.943.json
+.env.testnet
+testnet_run*.log
+luau/gdextension/demo2/bin/
+luau/gdextension/demo2/.godot/
+luau/gdextension/player/bin/
+luau/gdextension/player/.godot/
+luau/gdextension/player/build/
+luau/gdextension/publisher/bin/
+luau/gdextension/publisher/.godot/
+luau/gdextension/publisher/build/
+luau/gdextension/demo2/build/
+luau/gdextension/studio/build/
+# Every console from bots.ps1; written fresh on each run.
+luau/gdextension/demo2/tests/logs/
+
+# Staged catalogue items for a local run (scripts/stage-preview.js all .preview)
+.preview/
+# Written by SConstruct from pulse_gradient.json on every build.
+luau/gdextension/src/pulse_gradient.gen.h
+
+# scripts/dev-chain.js: a local chain's addresses, only while it runs
+luau/gdextension/demo2/scripts/src/shared/ContractsDev.luau
+.dev-chain.json
+luau/gdextension/src/version.gen.h
+luau/gdextension/player/build-linux/
+luau/gdextension/publisher/build-linux/
+luau/gdextension/studio/build-linux/
+luau/gdextension/demo2/build-linux/

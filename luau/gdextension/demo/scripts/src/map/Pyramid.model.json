@@ -1,0 +1,26 @@
+{
+  "className": "MeshPart",
+  "properties": {
+    "Anchored": true,
+    "CollisionFidelity": "Hull",
+    "Color": {
+      "Color3uint8": [
+        215,
+        180,
+        90
+      ]
+    },
+    "Material": "Sand",
+    "MeshId": "meshes/pyramid.obj",
+    "Position": [
+      20,
+      2.25,
+      -4
+    ],
+    "Size": [
+      6,
+      4.5,
+      6
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://cffj747yvufem"]
+
+[ext_resource type="Script" path="res://Main.gd" id="1_main"]
+[ext_resource type="Script" path="res://ScriptSync.gd" id="2_sync"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="World" type="PulseBlockzWorld" parent="."]
+player_name = "Ada"
+user_id = 7
+
+[node name="ScriptSync" type="Node" parent="."]
+script = ExtResource("2_sync")

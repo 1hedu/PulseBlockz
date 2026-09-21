@@ -1,0 +1,119 @@
+#!/usr/bin/env python
+# Build: scons platform=linux target=template_debug  (needs godot-cpp and luau as siblings)
+#   pulseblockz/luau/gdextension/SConstruct   <- this file
+#   pulseblockz/luau/src/                     <- sandbox + script worker (engine-agnostic)
+#   pulseblockz/luau/godot-cpp/               <- git clone -b 4.3 https://github.com/godotengine/godot-cpp
+#   pulseblockz/luau/luau/                    <- git clone https://github.com/luau-lang/luau (cmake build in luau/build)
+#   pulseblockz/luau/secp256k1/               <- bitcoin-core libsecp256k1 with recovery module (make secp-libs)
+import os
+
+# godot-cpp 4.3's Dictionary move assignment leaks the Dictionary it replaces.
+#
+# Every other type's `operator=(T&&)` swaps. Dictionary is special-cased to copy-construct instead
+# (binding_generator.py, needs_copy_instead_of_move), and that copy is written over `opaque` without
+# destroying what was there -- so `d = Dictionary()`, or `d = something_returning_one()`, drops a
+# reference to the old one and it is never freed. PulseBlockzWorld rebuilds its frame stats that way
+# every frame: about a kilobyte a frame, which on the hosted town was 25 MB a minute with nobody
+# connected, until the 1 GB droplet was swapping (2026-09-15). The copy assignment beside it does
+# destroy first; this makes the move assignment do the same, in the generator and in bindings
+# already generated, before godot-cpp builds.
+def _fix_godot_cpp_dictionary_move():
+    leak = "\tinternal::_call_builtin_constructor(_method_bindings.constructor_1, &opaque, &p_other);\n\treturn *this;\n}\n\n} //namespace godot"
+    fixed = "\tif (this != &p_other) {\n\t\t_method_bindings.destructor(&opaque);\n\t\tinternal::_call_builtin_constructor(_method_bindings.constructor_1, &opaque, &p_other);\n\t}\n\treturn *this;\n}\n\n} //namespace godot"
+    gen = "../godot-cpp/gen/src/variant/dictionary.cpp"
+    if os.path.exists(gen):
+        with open(gen, encoding="utf-8", newline="") as f:
+            text = f.read()
+        nl = "\r\n" if "\r\n" in text else "\n"   # generated on Windows, the bindings are CRLF
+        leak_nl, fixed_nl = leak.replace("\n", nl), fixed.replace("\n", nl)
+        mv = text.find("Dictionary &Dictionary::operator=(Dictionary &&p_other) {")
+        if mv >= 0 and text.find(leak_nl, mv) >= 0:
+            with open(gen, "w", encoding="utf-8", newline="") as f:
+                f.write(text[:mv] + text[mv:].replace(leak_nl, fixed_nl, 1))
+            print("SConstruct: fixed the Dictionary move-assignment leak in godot-cpp's generated bindings")
+    generator = "../godot-cpp/binding_generator.py"
+    # Anchored on the move ASSIGNMENT: the move constructor just above it has the same four lines,
+    # and a constructor has nothing yet to destroy.
+    head = '    # Move assignment.\n    result.append(f"{class_name} &{class_name}::operator=({class_name} &&p_other) {{")\n'
+    old = head + ('    if needs_copy_instead_of_move(class_name) and copy_constructor_index >= 0:\n'
+           '        result.append(\n'
+           '            f"\\tinternal::_call_builtin_constructor(_method_bindings.constructor_{copy_constructor_index}, &opaque, &p_other);"\n'
+           '        )\n')
+    new = head + ('    if needs_copy_instead_of_move(class_name) and copy_constructor_index >= 0:\n'
+           '        result.append("\\tif (this != &p_other) {")\n'
+           '        if builtin_api["has_destructor"]:\n'
+           '            result.append("\\t\\t_method_bindings.destructor(&opaque);")\n'
+           '        result.append(\n'
+           '            f"\\t\\tinternal::_call_builtin_constructor(_method_bindings.constructor_{copy_constructor_index}, &opaque, &p_other);"\n'
+           '        )\n'
+           '        result.append("\\t}")\n')
+    if os.path.exists(generator):
+        with open(generator, encoding="utf-8", newline="") as f:
+            text = f.read()
+        if old in text:
+            with open(generator, "w", encoding="utf-8", newline="") as f:
+                f.write(text.replace(old, new, 1))
+            print("SConstruct: fixed the Dictionary move-assignment leak in godot-cpp's binding generator")
+_fix_godot_cpp_dictionary_move()
+
+env = SConscript("../godot-cpp/SConstruct")
+LUAU = "../luau"
+SECP = "../secp256k1"
+env.Append(CPPPATH=["src/", "../src/", "thirdparty/meshoptimizer", "thirdparty/draco/src", f"{LUAU}/VM/include", f"{LUAU}/Compiler/include", f"{SECP}/include"])
+# CMake multi-config generators (MSVC) put the libs one level deeper, and name secp256k1 "libsecp256k1.lib".
+def libdir(base):
+    return f"{base}/Release" if os.path.isdir(f"{base}/Release") else base
+LUAU_LIB, SECP_LIB = libdir(f"{LUAU}/build"), libdir(f"{SECP}/build/lib")
+secp = "libsecp256k1" if os.path.exists(f"{SECP_LIB}/libsecp256k1.lib") else "secp256k1"
+env.Append(LIBPATH=[LUAU_LIB, SECP_LIB])
+env.Append(LIBS=["Luau.Compiler", "Luau.Bytecode", "Luau.Ast", "Luau.VM", "Luau.Common", secp])
+if env["platform"] == "windows":
+    env.Append(CPPDEFINES=["SECP256K1_STATIC"])   # header defaults to __declspec(dllimport) otherwise
+if env["platform"] in ("linux", "android"):
+    env.Append(CCFLAGS=["-pthread"], LINKFLAGS=["-pthread"])   # ScriptWorker uses std::thread
+# The PulseBlockz gradient, written into a header from its one definition, pulse_gradient.json --
+# which scripts/prep-gradient.js reads too, for the picture the orb and the Engram wear.
+import json
+with open("src/pulse_gradient.json", encoding="utf-8") as f:
+    _stops = json.load(f)["stops"]
+_lines = ["// Generated by SConstruct from pulse_gradient.json. Do not edit.",
+          "#pragma once",
+          "struct PulseGradientStop { float t, r, g, b; };",
+          "static const PulseGradientStop kPulseGradient[] = {"]
+_lines += ["    {%.4ff, %.4ff, %.4ff, %.4ff}," % (s["t"], s["rgb"][0], s["rgb"][1], s["rgb"][2]) for s in _stops]
+_lines += ["};", ""]
+_header = chr(10).join(_lines)
+if not os.path.exists("src/pulse_gradient.gen.h") or open("src/pulse_gradient.gen.h", encoding="utf-8").read() != _header:
+    with open("src/pulse_gradient.gen.h", "w", encoding="utf-8", newline=chr(10)) as f:
+        f.write(_header)
+# The version, from package.json, so the apps say which release they are and nothing has to be
+# kept in step by hand.
+with open("../../package.json", encoding="utf-8") as f:
+    _version = json.load(f)["version"]
+_built = __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M")
+_vh = chr(10).join(["// Generated by SConstruct from package.json. Do not edit.", "#pragma once",
+                    '#define PULSEBLOCKZ_VERSION "%s"' % _version,
+                    '#define PULSEBLOCKZ_BUILT "%s"' % _built, ""])
+if not os.path.exists("src/version.gen.h") or open("src/version.gen.h", encoding="utf-8").read() != _vh:
+    with open("src/version.gen.h", "w", encoding="utf-8", newline=chr(10)) as f:
+        f.write(_vh)
+sources = ["src/register_types.cpp", "src/pulseblockz_world.cpp", "src/keystore.cpp", "src/pulseblockz_crypto.cpp", "src/pulseblockz_chain.cpp", "src/pulseblockz_tremolo.cpp","../src/luau_sandbox.cpp", "../src/script_worker.cpp", "../src/eip712.cpp", "../src/chain_assets.cpp",
+           "../src/rbx_instance.cpp", "../src/rbx_types.cpp", "../src/rbx_runtime.cpp", "../src/rbx_api.cpp", "../src/rbx_host.cpp", "../src/rbx_net.cpp", "../src/rbx_wire.cpp", "../src/rbx_chat.cpp", "../src/rbx_spatial.cpp", "../src/rbx_pathfinding.cpp", "../src/rbx_editable_mesh.cpp",
+           # meshoptimizer's simplifier (MIT), the one Godot's own SurfaceTool.generate_lod wraps -- called
+           # directly, because that wrapper is deprecated and warns on first use.
+           "thirdparty/meshoptimizer/simplifier.cpp"]
+# Draco (Apache-2.0), the geometry compression inside a Roblox mesh of version 7: the file is a
+# "COREMESH" container holding a standard Draco blob. Decoder modules only -- no io, scene,
+# texture or transcoder -- compiled in like meshoptimizer rather than built by CMake, so the
+# extension keeps its one build step. draco_features.h states the feature set in place of
+# CMake's generated copy.
+_draco = []
+for _root, _dirs, _files in os.walk("thirdparty/draco/src/draco"):
+    _draco += [os.path.join(_root, f).replace(chr(92), "/") for f in _files if f.endswith(".cc")]
+sources += sorted(_draco)
+lib = env.SharedLibrary(
+    "demo/bin/libpulseblockz_luau{}{}".format(env["suffix"], env["SHLIBSUFFIX"]), source=sources)
+# The Studio, the Player, the Publisher and the town are their own Godot projects, and a project cannot reach
+# outside its own res://, so the shared library is copied into each of them as well.
+# Leaving demo2 out of this is how it ends up running against a stale build.
+Default(lib, env.Install("studio/bin", lib[0]), env.Install("demo2/bin", lib[0]), env.Install("player/bin", lib[0]), env.Install("publisher/bin", lib[0]))

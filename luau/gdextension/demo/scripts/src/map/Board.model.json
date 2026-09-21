@@ -1,0 +1,111 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "className": "TextButton",
+          "name": "Press",
+          "properties": {
+            "BackgroundColor3": {
+              "Color3uint8": [
+                240,
+                200,
+                60
+              ]
+            },
+            "Position": [
+              [
+                0.25,
+                0
+              ],
+              [
+                0.55,
+                0
+              ]
+            ],
+            "Size": [
+              [
+                0.5,
+                0
+              ],
+              [
+                0.4,
+                0
+              ]
+            ],
+            "Text": "Press me",
+            "TextScaled": true
+          }
+        },
+        {
+          "className": "TextLabel",
+          "name": "Title",
+          "properties": {
+            "BackgroundColor3": {
+              "Color3uint8": [
+                20,
+                60,
+                120
+              ]
+            },
+            "Font": "GothamBold",
+            "FontFace": {
+              "family": "rbxasset://fonts/families/GothamSSm.json",
+              "style": "Normal",
+              "weight": 700
+            },
+            "Size": [
+              [
+                1,
+                0
+              ],
+              [
+                0.5,
+                0
+              ]
+            ],
+            "Text": "Pressed: 0",
+            "TextColor3": {
+              "Color3uint8": [
+                255,
+                255,
+                255
+              ]
+            },
+            "TextScaled": true
+          }
+        }
+      ],
+      "className": "SurfaceGui",
+      "name": "Screen",
+      "properties": {
+        "CanvasSize": [
+          800,
+          400
+        ]
+      }
+    }
+  ],
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        30,
+        30,
+        35
+      ]
+    },
+    "Material": "Metal",
+    "Position": [
+      10,
+      3,
+      18
+    ],
+    "Size": [
+      8,
+      4,
+      0.5
+    ]
+  }
+}

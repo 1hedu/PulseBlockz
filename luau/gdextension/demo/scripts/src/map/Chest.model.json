@@ -1,0 +1,44 @@
+{
+  "children": [
+    {
+      "className": "Sound",
+      "name": "Creak",
+      "properties": {
+        "SoundId": "sounds/creak.wav",
+        "Volume": 0.8
+      }
+    },
+    {
+      "className": "ProximityPrompt",
+      "name": "Open",
+      "properties": {
+        "ActionText": "Open",
+        "KeyboardKeyCode": "F",
+        "MaxActivationDistance": 12,
+        "ObjectText": "Chest"
+      }
+    }
+  ],
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        120,
+        80,
+        40
+      ]
+    },
+    "Material": "Wood",
+    "Position": [
+      -5,
+      0.75,
+      -8
+    ],
+    "Size": [
+      2.5,
+      1.5,
+      2.5
+    ]
+  }
+}

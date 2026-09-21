@@ -1,0 +1,8 @@
+{
+  "className": "Part",
+  "properties": {
+    "Size": [0.4, 0.4, 3],
+    "Color": [99, 73, 46],
+    "Material": "Wood"
+  }
+}

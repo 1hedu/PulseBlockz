@@ -1,0 +1,39 @@
+{
+  "children": [
+    {
+      "className": "SpecialMesh",
+      "name": "SpecialMesh",
+      "properties": {
+        "MeshId": "meshes/cube.glb",
+        "MeshType": "FileMesh",
+        "Scale": [
+          3,
+          3,
+          3
+        ]
+      }
+    }
+  ],
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        150,
+        100,
+        50
+      ]
+    },
+    "Material": "Wood",
+    "Position": [
+      -20,
+      1.5,
+      -6
+    ],
+    "Size": [
+      3,
+      3,
+      3
+    ]
+  }
+}

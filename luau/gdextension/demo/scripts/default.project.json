@@ -1,0 +1,27 @@
+{
+  "name": "demo",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "$path": "src/shared",
+      "Config": {
+        "$className": "Configuration",
+        "$attributes": { "MaxPlayers": 8 }
+      }
+    },
+    "Lighting": {
+      "$className": "Lighting",
+      "$properties": { "Ambient": [0.2, 0.2, 0.25] }
+    },
+    "ServerScriptService": { "$path": "src/server" },
+    "StarterPack": { "$path": "src/tools" },
+    "Teams": { "$path": "src/teams" },
+    "StarterPlayer": {
+      "StarterPlayerScripts": { "$path": "src/client" }
+    },
+    "Workspace": {
+      "Map": { "$path": "src/map" }
+    }
+  }
+}

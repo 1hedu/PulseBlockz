@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://bplayersession01"]
+
+[ext_resource type="Script" path="res://host/ScriptSync.gd" id="1_sync"]
+[ext_resource type="Script" path="res://host/Wallet.gd" id="2_wallet"]
+
+[node name="Session" type="Node3D"]
+
+[node name="World" type="PulseBlockzWorld" parent="."]
+
+[node name="ScriptSync" type="Node" parent="."]
+script = ExtResource("1_sync")
+load_from_disk = false
+hot_reload = false
+
+[node name="Wallet" type="Node" parent="."]
+script = ExtResource("2_wallet")

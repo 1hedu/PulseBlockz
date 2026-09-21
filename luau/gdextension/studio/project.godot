@@ -1,0 +1,18 @@
+; PulseBlockz Studio — the place editor. See studio/Studio.gd.
+
+config_version=5
+
+[application]
+
+config/name="PulseBlockz Studio"
+run/main_scene="res://Studio.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+
+[rendering]
+
+anti_aliasing/quality/msaa_3d=2

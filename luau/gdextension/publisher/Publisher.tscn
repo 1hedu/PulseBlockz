@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bpublishermain1"]
+
+[ext_resource type="Script" path="res://Publisher.gd" id="1_publisher"]
+[ext_resource type="Script" path="res://host/Wallet.gd" id="2_wallet"]
+
+[node name="Publisher" type="Node"]
+script = ExtResource("1_publisher")
+
+[node name="Wallet" type="Node" parent="."]
+script = ExtResource("2_wallet")
+auto_start = false

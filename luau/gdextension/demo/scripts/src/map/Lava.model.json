@@ -1,0 +1,24 @@
+{
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Color": {
+      "Color3uint8": [
+        255,
+        80,
+        0
+      ]
+    },
+    "Material": "Neon",
+    "Position": [
+      0,
+      0.2,
+      -18
+    ],
+    "Size": [
+      10,
+      0.4,
+      10
+    ]
+  }
+}
