@@ -10,6 +10,7 @@ const { ethers } = require("ethers");
 const solc = require("solc");
 const fs = require("fs"), path = require("path");
 const { execFileSync } = require("child_process");
+const { assemble, recordOf } = require("./atropa-source");
 
 const ROOT = path.join(__dirname, "..");
 const RPC = "https://rpc.v4.testnet.pulsechain.com";
@@ -27,10 +28,22 @@ const only = onlyAt >= 0 ? new Set(args[onlyAt + 1].split(",")) : null;
 const provider = new ethers.JsonRpcProvider(RPC, 943, { staticNetwork: true });
 const addrs = JSON.parse(fs.readFileSync(path.join(ROOT, "addresses.943.json"), "utf8"));
 
-async function api(base, route) {
-  const r = await fetch(base + route);
-  if (!r.ok) throw new Error(`${route}: ${r.status}`);
-  return r.json();
+async function api(base, route, tries = 6) {
+  let last;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const r = await fetch(base + route);
+      if (r.ok) return r.json();
+      // 404 is an answer -- nothing is verified at that address -- and not worth retrying.
+      if (r.status === 404) { const e = new Error(`${route}: 404`); e.notFound = true; throw e; }
+      last = new Error(`${route}: ${r.status}`);
+    } catch (e) {
+      if (e.notFound) throw e;
+      last = e;
+    }
+    await new Promise((res) => setTimeout(res, 700 * (i + 1)));
+  }
+  throw last;
 }
 
 /// Runtime code with its CBOR metadata tail removed.
@@ -131,8 +144,11 @@ function versionsOf(file) {
 /// even for a contract another contract made (UGC1155, by the Marketplace), whose transaction
 /// input is its creator's.
 async function creationCode(address) {
+  // The only place the creation code is to be had: a contract the Marketplace deployed in its own
+  // constructor has no transaction of its own to read it from. Worth waiting out a bad minute on
+  // the explorer, because without it a contract with constructor arguments cannot be submitted.
   try {
-    const sc = await api(API, "smart-contracts/" + address);
+    const sc = await api(API, "smart-contracts/" + address, 14);
     if (sc.creation_bytecode) return sc.creation_bytecode;
   } catch {}
   return null;
@@ -228,22 +244,33 @@ async function prepareOurs(label, address, file, name) {
 
 const ATROPA_SETTINGS = { optimizer: { enabled: false, runs: 200 }, evmVersion: "shanghai" };
 const MAINNET_RNG = "0xa96BcbeD7F01de6CEEd14fC86d90F21a36dE2143";
-const MAINNET_MATH = "0x5EF3011243B03f817223A19f277638397048A0DC";
+const MAINNET_MATH = "0xB680F0cc810317933F234f67EB6A9E923407f05D";   // atropaMath 1.1, the one deploy-atropa.js
+// puts up. It pointed at 1.0 here, so the rebuild could not match what was deployed and the
+// contract stayed unverifiable: the two scripts must name the same source or neither is right.
 
 async function prepareAtropa(compiler) {
-  const rngSrc = (await api(MAINNET_API, "smart-contracts/" + MAINNET_RNG)).source_code;
-  const mathSrc = (await api(MAINNET_API, "smart-contracts/" + MAINNET_MATH)).source_code;
+  const rngRecord = recordOf(await api(MAINNET_API, "smart-contracts/" + MAINNET_RNG));
+  const mathRecord = recordOf(await api(MAINNET_API, "smart-contracts/" + MAINNET_MATH));
   const libs = addrs.atropaLibraries || {};
   const ours = { ...libs };
+  // The copy here points at our own RNG, not mainnet's, and that one edit is the only difference
+  // between what is deployed here and the source mainnet verified.
   const hardcoded = `RNG(${MAINNET_RNG})`;
-  const mathHere = mathSrc.replace(hardcoded, `RNG(${ethers.getAddress(addrs.RNG)})`);
+  mathRecord.source = mathRecord.source.replace(hardcoded, `RNG(${ethers.getAddress(addrs.RNG)})`);
+  if (mathRecord.source.includes(hardcoded) || !mathRecord.source.includes(ethers.getAddress(addrs.RNG)))
+    throw new Error("atropaMath: the hardcoded RNG address was not where it was expected");
+  const rngSources = assemble("RNG.sol", rngRecord);
+  const mathSources = assemble("atropaMath.sol", mathRecord);
   const items = [];
-  const one = async (label, address, file, text, name, libraries) => {
+  const one = async (label, address, file, sources, name, libraries) => {
     const settings = { ...ATROPA_SETTINGS, libraries: libraries ? { [file]: libraries } : {},
       outputSelection: { "*": { "*": ["abi", "evm.bytecode", "evm.deployedBytecode", "metadata"] } } };
-    const standard = { language: "Solidity", sources: { [file]: { content: text } }, settings };
+    const standard = { language: "Solidity", sources, settings };
     const out = JSON.parse(compiler.compile(JSON.stringify(standard)));
-    const c = out.contracts[file][name];
+    const bad = (out.errors || []).filter((e) => e.severity === "error");
+    if (bad.length) throw new Error(`${label}: ${bad.map((e) => e.formattedMessage).join("\n")}`);
+    const c = out.contracts[file] && out.contracts[file][name];
+    if (!c) throw new Error(`${label}: ${name} is not in ${file}`);
     const onChain = (await provider.getCode(address)).slice(2).toLowerCase();
     // A library's code opens with a PUSH20 of its own address (the call guard): blank both sides.
     const guard = name !== "RNG" && name !== "atropaMath" || (file === "RNG.sol" && name === "atropaMath")
@@ -253,11 +280,11 @@ async function prepareAtropa(compiler) {
       ? { label, address, kind: "atropa", compiler: ATROPA_COMPILER, standard, contractName: `${file}:${name}`, ctorArgs: "", full: false, source: "mainnet's verified source" + (name === "atropaMath" && file === "atropaMath.sol" ? ", RNG address changed" : "") }
       : { label, address, problem: "the rebuild does not match the code on chain" });
   };
-  await one("lib atropaMath", libs.atropaMath, "RNG.sol", rngSrc, "atropaMath", null);
-  await one("lib Conjecture", libs.Conjecture, "RNG.sol", rngSrc, "Conjecture", { atropaMath: libs.atropaMath });
-  await one("lib Dynamic", libs.Dynamic, "RNG.sol", rngSrc, "Dynamic", { atropaMath: libs.atropaMath });
-  await one("RNG", addrs.RNG, "RNG.sol", rngSrc, "RNG", ours);
-  await one("atropaMath", addrs.atropaMath, "atropaMath.sol", mathHere, "atropaMath", null);
+  await one("lib atropaMath", libs.atropaMath, "RNG.sol", rngSources, "atropaMath", null);
+  await one("lib Conjecture", libs.Conjecture, "RNG.sol", rngSources, "Conjecture", { atropaMath: libs.atropaMath });
+  await one("lib Dynamic", libs.Dynamic, "RNG.sol", rngSources, "Dynamic", { atropaMath: libs.atropaMath });
+  await one("RNG", addrs.RNG, "RNG.sol", rngSources, "RNG", ours);
+  await one("atropaMath", addrs.atropaMath, "atropaMath.sol", mathSources, "atropaMath", null);
   return items;
 }
 
@@ -265,6 +292,12 @@ async function prepareAtropa(compiler) {
 
 async function isVerified(address) {
   try { return !!(await api(API, "smart-contracts/" + address)).is_verified; } catch { return false; }
+}
+
+/// The same question asked of the address endpoint, which answers when the other one is sulking.
+async function isVerifiedEither(address) {
+  if (await isVerified(address)) return true;
+  try { return !!(await api(API, "addresses/" + address)).is_verified; } catch { return false; }
 }
 
 async function submit(item) {
@@ -279,7 +312,7 @@ async function submit(item) {
   if (!r.ok) throw new Error(`${r.status} ${text.slice(0, 200)}`);
   for (let i = 0; i < 40; i++) {
     await new Promise((res) => setTimeout(res, 5000));
-    if (await isVerified(item.address)) return "verified";
+    if (await isVerifiedEither(item.address)) return "verified";
   }
   return "submitted, not verified yet: " + text.slice(0, 120);
 }
@@ -307,7 +340,7 @@ async function status() {
     try {
       const r = await api(API, "smart-contracts/" + address);
       if (r.is_verified) { done++; says = r.is_fully_verified ? "verified" : "verified (partial: source edited since, same code)"; }
-    } catch { says = "the explorer did not answer"; }
+    } catch (e) { says = e.notFound ? "not yet" : "the explorer did not answer"; }
     console.log(`${label.padEnd(15)} ${address}  ${says}`);
   }
   console.log(`\n${done} verified`);
@@ -340,7 +373,7 @@ async function main() {
 
   let ok = 0;
   for (const it of items) {
-    const already = !it.problem && await isVerified(it.address);
+    const already = !it.problem && await isVerifiedEither(it.address);
     if (it.problem) {
       console.log(`${it.label.padEnd(15)} ${it.address}  SKIP -- ${it.problem}`);
       continue;
