@@ -769,7 +769,7 @@ func _card(e: Dictionary) -> Control:
 func _preview_body(box: VBoxContainer, info: Dictionary) -> void:
 	box.add_child(_label(info.name, 26, INK))
 	var thumb := TextureRect.new()
-	thumb.custom_minimum_size = Vector2(0, 0)
+	thumb.custom_minimum_size = Vector2(0, 220)
 	thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	thumb.visible = false
@@ -956,7 +956,6 @@ func _load_thumbnail(uri: String, into: TextureRect) -> void:
 	if err != OK:
 		return
 	into.texture = ImageTexture.create_from_image(img)
-	into.custom_minimum_size = Vector2(0, 220)
 	into.visible = true
 
 func _say(text: String) -> void:

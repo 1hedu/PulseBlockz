@@ -27,6 +27,16 @@ func _initialize() -> void:
 	_wipe(ProjectSettings.globalize_path(PROFILE))
 	_run.call_deferred()
 
+## The first TextureRect anywhere under a node, which in a card is its picture.
+func _a_texture_rect(n: Node) -> TextureRect:
+	if n is TextureRect:
+		return n
+	for c in n.get_children():
+		var found := _a_texture_rect(c)
+		if found != null:
+			return found
+	return null
+
 func _wipe(dir: String) -> void:
 	var d := DirAccess.open(dir)
 	if d == null:
@@ -250,6 +260,26 @@ func _run() -> void:
 	host.queue_free()
 	await _until(func(): return player.session == null, 20.0)
 	check(player.session == null and ended[0].contains("closed the connection"), "the server going away ends the session and says so: %s" % ended[0])
+
+	# A row's picture, at the row's size. The loader used to set the preview page's height and no
+	# width on whatever TextureRect it was handed, so a row ended up 220 tall with a zero-wide
+	# picture in it: a hole where the thumbnail goes, on the first page of the Player.
+	var art := Image.create(16, 9, false, Image.FORMAT_RGB8)
+	art.fill(Color(0.2, 0.6, 0.9))
+	var art_uri := _store(art.save_png_to_buffer(), "image/png")
+	var card: Control = player._card({"name": "With a picture", "uri": good, "recent": true,
+		"played": 1, "server": "", "thumb": art_uri})
+	root.add_child(card)
+	var shot: TextureRect = _a_texture_rect(card)
+	check(shot != null, "a remembered place with a picture puts one in its row")
+	if shot != null:
+		await _until(func(): return shot.texture != null, 10.0)
+		check(shot.texture != null, "the row's picture loads")
+		check(shot.custom_minimum_size == Vector2(96, 54),
+			"and keeps the row's size, not the preview page's: %s" % shot.custom_minimum_size)
+		check(shot.size.x > 0.0 or shot.custom_minimum_size.x > 0.0,
+			"so it has a width to be seen in")
+	card.queue_free()
 
 	print("%d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
