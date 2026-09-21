@@ -26,6 +26,12 @@ disk, the network or a key.
 Download the release for your machine and run any of the three apps. They share the engine
 library beside them, so keep a folder together. On Linux, `chmod +x *.x86_64` first.
 
+Something to open with it: [pBlockz Home](https://github.com/1hedu/pBlockzHome) is a town whose scripts, models
+and assets are all on chain. Paste its link into the Player to play it alone, or join the
+server it names at `play.safewrap.xyz:8800`.
+
+    pblockz://69524cc89625f60ba751a511bd7d1ecbd6503e179577e7e93027f80b454840ea?chain=943:0x0f9D08e13BE2345856026615d05F7251F07efAfA:1403&mime=application%2Fjson
+
 **Importing a Roblox place:** File â†’ Open your `.rbxl`. Meshes and textures are private on
 Roblox, so the Studio fetches them signed in as you. Put your `.ROBLOSECURITY` cookie in
 `%APPDATA%\Godot\app_userdata\PulseBlockz Studio\roblox_cookie.txt` on Windows, or
@@ -60,8 +66,8 @@ what a player is carrying, `Forwarder` a signature somebody else pays to send â€
 no delist and no upgrade. A creator prices in whatever tokens they accept and is paid directly.
 `Marketplace` is deployed beside them for selling between wallets; nothing in these three apps
 goes through it yet. A game's own contracts are the game's: the town's fishing, duelling and
-noticeboard live in its repository, not here. `ARCHITECTURE.md` and `SERVER.md` explain why a
-server is only for what cannot be on chain.
+noticeboard live in [its repository](https://github.com/1hedu/pBlockzHome), not here. `ARCHITECTURE.md` and
+`SERVER.md` explain why a server is only for what cannot be on chain.
 
 ## Docs
 
