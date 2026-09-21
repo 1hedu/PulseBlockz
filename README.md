@@ -1,5 +1,6 @@
 # PulseBlockz
 
+![The title screen the Player opens on](luau/gdextension/host/title.png)
 
 A Roblox-shaped game engine and Studio, with places, assets and ownership on PulseChain.
 
